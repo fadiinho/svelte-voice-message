@@ -1,10 +1,37 @@
 <script>
 	import { onMount } from 'svelte';
+	import Smile from '../components/Smile.svelte';
+	import AudioPlayer, { setProgress, playAudio } from '../components/AudioPlayer.svelte';
+	import Message from '../components/Message.svelte';
+
 	let message = '';
 	let voices = [];
 
 	function clearValue() {
 		message = '';
+	}
+
+	async function fetchMessage(e) {
+		const url = 'https://api.streamelements.com/kappa/v2/speech?';
+		let select = document.querySelector('.voices');
+		let voice = select.value;
+		if (!message) {
+			// TODO: Warn if not message
+			return;
+		}
+
+		let tts = await fetch(url + `voice=${voice}&text=${encodeURIComponent(message.trim())}`);
+
+		if (!tts.ok) {
+			// TODO: Make a warn
+			return;
+		}
+
+		let mp3 = await tts.blob();
+
+		let blobUrl = URL.createObjectURL(mp3);
+
+		playAudio(blobUrl);
 	}
 
 	onMount(() => {
@@ -14,14 +41,18 @@
 
 <main>
 	<div class="container">
+		<Smile />
 		<h1>Teste Mensagem de Voz</h1>
 		<textarea id="text" rows="10" cols="30" maxlength="134" bind:value={message} />
-		<select class="voices">
-			{#each voices as voice}
-				<option>{voice}</option>
-			{/each}
-		</select>
-		<button class="btn">Enviar</button>
+		<AudioPlayer />
+		{#if voices}
+			<select class="voices">
+				{#each voices as voice}
+					<option>{voice}</option>
+				{/each}
+			</select>
+		{/if}
+		<button on:click={fetchMessage} class="btn">Enviar</button>
 	</div>
 </main>
 
@@ -32,6 +63,8 @@
 		--bg-color: #000;
 		--primary-color: #040f16;
 		--secondary-color: #0094c6;
+
+		--error-color: #f00;
 	}
 
 	:global(*) {
@@ -100,15 +133,23 @@
 
 	.voices {
 		border: 2px solid var(--secondary-color);
+		outline: none;
 		border-radius: 8px;
 		padding: 0.5rem;
-		margin-bottom: 1.5rem;
+		margin: 1.5rem 0;
 		text-align: center;
 		color: #fff;
 		background-color: var(--primary-color);
 		font-size: 1em;
+		cursor: pointer;
+		transition: 0.5s;
 	}
 
+	.voices:hover {
+		filter: drop-shadow(0px 0px 4px var(--secondary-color));
+	}
+
+	/*
 	.clear {
 		position: relative;
 		display: none;
@@ -136,4 +177,5 @@
 		background-color: var(--primary-color);
 		transform: rotate(-45deg) translateY(-1px);
 	}
+  */
 </style>
