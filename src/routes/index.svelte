@@ -1,8 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import Smile from '../components/Smile.svelte';
-	import AudioPlayer, { setProgress, playAudio } from '../components/AudioPlayer.svelte';
-	import Message from '../components/Message.svelte';
+	import AudioPlayer, { playAudio } from '../components/AudioPlayer.svelte';
 
 	let message = '';
 	let voices = [];
@@ -11,12 +10,25 @@
 		message = '';
 	}
 
-	async function fetchMessage(e) {
+	function messageError() {
+		let text = document.querySelector('#text');
+
+		function toggle() {
+			text.classList.toggle('error');
+		}
+
+		if (text.classList.contains('error')) return;
+
+		toggle();
+		setTimeout(toggle, 2000);
+	}
+
+	async function fetchMessage() {
 		const url = 'https://api.streamelements.com/kappa/v2/speech?';
 		let select = document.querySelector('.voices');
 		let voice = select.value;
 		if (!message) {
-			// TODO: Warn if not message
+			messageError();
 			return;
 		}
 
@@ -111,6 +123,22 @@
 
 	#text:focus {
 		filter: drop-shadow(0px 0px 4px var(--secondary-color));
+	}
+
+	#text:global(.error) {
+		filter: drop-shadow(0px 0px 4px var(--error-color));
+		border: 2px solid var(--error-color);
+		animation: error-animation 0.1s linear;
+	}
+
+	@keyframes error-animation {
+		0% {
+			transform: translateX(10px);
+		}
+
+		100% {
+			transform: translateX(-10px);
+		}
 	}
 
 	.btn {
