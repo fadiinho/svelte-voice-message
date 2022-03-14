@@ -1,7 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
-
-	const handleClick = (e) => {
+	const handleClick = () => {
 		document.querySelector('.face').classList.toggle('happy');
 		document.querySelector('.face').classList.toggle('sad');
 	};
@@ -10,8 +8,12 @@
 Mind Linda
 <div class="face sad">
 	<div class="eyes">
-		<div class="eye" id="eye1" />
-		<div class="eye" id="eye2" />
+		<div class="eye" id="eye1">
+			<div class="water-drop" id="drop1" />
+		</div>
+		<div class="eye" id="eye2">
+			<div class="water-drop" id="drop2" />
+		</div>
 	</div>
 	<div class="mouth" />
 	<div on:click={handleClick} class="face-placeholder" />
@@ -55,54 +57,102 @@ Mind Linda
 		position: relative;
 		display: flex;
 		justify-content: center;
-		width: 8px;
-		height: 8px;
+		width: 1em;
+		height: 1em;
 		background-color: #000;
 		border-radius: 50%;
-		overflow: hidden;
-		transition: 0.2s;
 	}
 
-	.face:global(.happy) > .eyes > #eye1,
-	.face:global(.happy) > .eyes > #eye2 {
-		transform: scale(2, 2);
+	.water-drop {
+		display: none;
 	}
 
-	.face:global(.happy) > .eyes > #eye1::before,
-	.face:global(.happy) > .eyes > #eye2::before {
+	.face:global(.happy) > .eyes > .eye > .water-drop {
+		display: block;
+		position: absolute;
+		width: 60%;
+		height: 8%;
+		bottom: 0;
+
+		background-color: #1000ff;
+		z-index: 99;
+		border-radius: 10px;
+	}
+
+	.face:global(.happy) > .eyes > .eye > .water-drop#drop1::before {
+		transform: translateX(-1px);
+	}
+
+	.face:global(.happy) > .eyes > .eye > .water-drop#drop2::before {
+		transform: translateX(9px);
+		border-radius: 0 50% 50% 50%;
+	}
+
+	.face:global(.happy) > .eyes > .eye > .water-drop::before {
 		content: '';
 		position: absolute;
-		width: 50%;
-		height: 50%;
-
-		border-radius: 10px;
+		width: 15%;
+		height: 100%;
+		border-radius: 50% 0 50% 50%;
 		background-color: #fff;
 	}
+
+	/* Eyelids */
+
+	.face:global(.happy) > .eyes > #eye1::after,
+	.face:global(.happy) > .eyes > #eye2::after {
+		content: '';
+		position: absolute;
+		width: 100%;
+		height: 5px;
+		top: 0px;
+		background-color: var(--secondary-color);
+	}
+
+	/* Inner Eye */
+
+	.face > .eyes > #eye1::before {
+		transition: right 0.1s;
+		right: 3px;
+	}
+
+	.face > .eyes > #eye2::before {
+		transition: left 0.1s;
+		left: 3px;
+	}
+	.face > .eyes > #eye1::before,
+	.face > .eyes > #eye2::before {
+		content: '';
+		position: absolute;
+		width: 60%;
+		height: 60%;
+
+		top: 0;
+		border-radius: 50%;
+		background-color: #fff;
+		transition: 0.1s;
+	}
+
 	.face:global(.happy) > .eyes > #eye1::before {
-		right: 5%;
+		right: 10%;
 	}
 
 	.face:global(.happy) > .eyes > #eye2::before {
-		left: 5%;
-	}
-
-	.face:global(.sad) > .eyes > #eye1,
-	.face:global(.sad) > .eyes > #eye2 {
-		display: flex;
-		justify-content: center;
-		align-items: center;
+		left: 10%;
 	}
 
 	.face:global(.sad) > .eyes > #eye1::before,
 	.face:global(.sad) > .eyes > #eye2::before {
 		content: '';
 		position: absolute;
-		width: 50%;
-		height: 50%;
+		width: 60%;
+		height: 60%;
 
-		border-radius: 10px;
+		top: 3px;
+		border-radius: 50%;
 		background-color: #fff;
 	}
+	/* End Inner Eye */
 
 	.mouth {
 		display: flex;
